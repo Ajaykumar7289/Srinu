@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Srinu Harvester Calculations</title>
+    <style>
+        /* General Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://www.deere.com/assets/images/region-4/products/harvesting/r4k010997-rrd-1365x768.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4); /* Adjust the 0.5 for more or less dimming */
+        z-index: -1;
+    }
+
+
+        .container {
+            background-color: rgb(255, 255, 255,0.9);
+            padding: 20px;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.8em;
+            color: #2E86C1;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 1em;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            font-size: 1em;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #2E86C1;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #1B4F72;
+        }
+
+        .result, .history {
+            margin-top: 30px;
+            font-size: 1.1em;
+            text-align: left;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+        }
+
+        .result p, .history p {
+            margin-bottom: 10px;
+        }
+
+        span {
+            font-weight: bold;
+            color: #0015ff;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .history-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            position: relative;
+            background-color: #f9f9f9;
+        }
+
+        .remove-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Colors for numbers */
+        .value {
+            color: #0015ff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container" id="calculator-container">
+        <!-- Calculator Form -->
+        <header>
+            <h1>Welcome to Srinu Harvester Calculator</h1>
+        </header>
+        <main>
+            <div class="form-group">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" placeholder="Enter customer name" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" placeholder="Enter location" required>
+            </div>
+            <div class="form-group">
+                <label for="workDescription">Work Description:</label>
+                <input type="text" id="workDescription" placeholder="Enter work details" required>
+            </div>
+            <div class="form-group">
+                <label for="hoursWorked">Total Hours Worked:</label>
+                <input type="number" id="hoursWorked" placeholder="Enter hours" required>
+            </div>
+            <div class="form-group">
+                <label for="hourlyRate">Hourly Rate (Rupees):</label>
+                <input type="number" id="hourlyRate" placeholder="Enter hourly rate" required>
+            </div>
+            <div class="form-group">
+                <label for="dieselConsumed">Total Diesel Consumed (Liters):</label>
+                <input type="number" id="dieselConsumed" placeholder="Enter diesel consumed" required>
+            </div>
+            <div class="form-group">
+                <label for="dieselRate">Diesel Rate (Rupees per Liter):</label>
+                <input type="number" id="dieselRate" placeholder="Enter diesel rate" required>
+            </div>
+            <button onclick="calculateEarnings()">Calculate</button>
+            <div class="result" id="result">
+                <!-- Display results here -->
+            </div>
+            <div class="history" id="history">
+                <!-- Display calculation history here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function calculateEarnings() {
+            const customerName = document.getElementById('customerName').value;
+            const location = document.getElementById('location').value;
+            const workDescription = document.getElementById('workDescription').value;
+            const hoursWorked = parseFloat(document.getElementById('hoursWorked').value);
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+            const dieselConsumed = parseFloat(document.getElementById('dieselConsumed').value);
+            const dieselRate = parseFloat(document.getElementById('dieselRate').value);
+
+            const hoursEarnings = hoursWorked * hourlyRate;
+            const dieselCost = dieselConsumed * dieselRate;
+            const netEarnings = hoursEarnings - dieselCost;
+
+            document.getElementById('result').innerHTML = `
+                <div class="section-title">Current Calculation:</div>
+                <p><b>Customer Name:</b> <span>${customerName}</span></p>
+                <p><b>Location:</b> <span>${location}</span></p>
+                <p><b>Work Description:</b> <span>${workDescription}</span></p>
+                <p><b>Total Hours Worked:</b> <span class="value">${hoursWorked}</span> hours</p>
+                <p><b>Hourly Rate:</b> <span class="value">${hourlyRate}</span> Rupees/hour</p>
+                <p><b>Earnings from Hours:</b> <span class="value">${hoursEarnings.toFixed(2)}</span> Rupees</p>
+
+                <div class="section-title">Diesel Usage Summary:</div>
+                <p><b>Total Diesel Consumed:</b> <span class="value">${dieselConsumed}</span> liters</p>
+                <p><b>Diesel Rate:</b> <span class="value">${dieselRate}</span> Rupees/liter</p>
+                <p><b>Total Diesel Cost:</b> <span class="value">${dieselCost.toFixed(2)}</span> Rupees</p>
+
+                <div class="section-title">Net Earnings:</div>
+                <p><b>Net Earnings:</b> <span class="value">${netEarnings.toFixed(2)}</span> Rupees</p>
+            `;
+
+            saveToHistory(customerName, location, workDescription, hoursWorked, hourlyRate, dieselConsumed, dieselRate, hoursEarnings, dieselCost, netEarnings);
+        }
+
+        function saveToHistory(customerName, location, workDescription, hoursWorked, hourlyRate, dieselConsumed, dieselRate, hoursEarnings, dieselCost, netEarnings) {
+            const calculation = {
+                customerName,
+                location,
+                workDescription,
+                hoursWorked,
+                hourlyRate,
+                dieselConsumed,
+                dieselRate,
+                hoursEarnings,
+                dieselCost,
+                netEarnings
+            };
+
+            let history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
+            history.unshift(calculation);
+            localStorage.setItem('calculatorHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const historyContainer = document.getElementById('history');
+            const history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
+
+            historyContainer.innerHTML = '<div class="section-title">Calculation History:</div>';
+            history.forEach((calc, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <p><b>Customer Name:</b> <span>${calc.customerName}</span></p>
+                    <p><b>Location:</b> <span>${calc.location}</span></p>
+                    <p><b>Work Description:</b> <span>${calc.workDescription}</span></p>
+                    <p><b>Total Hours Worked:</b> <span class="value">${calc.hoursWorked}</span></p>
+                    <p><b>Hourly Rate:</b> <span class="value">${calc.hourlyRate}</span> Rupees/hour</p>
+                    <p><b>Earnings from Hours:</b> <span class="value">${calc.hoursEarnings.toFixed(2)}</span> Rupees</p>
+                    <p><b>Total Diesel Consumed:</b> <span class="value">${calc.dieselConsumed}</span> liters</p>
+                    <p><b>Diesel Rate:</b> <span class="value">${calc.dieselRate}</span> Rupees/liter</p>
+                    <p><b>Total Diesel Cost:</b> <span class="value">${calc.dieselCost.toFixed(2)}</span> Rupees</p>
+                    <p><b>Net Earnings :</b> <span class="value">${calc.netEarnings.toFixed(2)}</span> Rupees</p>
+                    <button class="remove-btn" onclick="removeHistoryItem(${index})">Remove</button>
+                `;
+                historyContainer.appendChild(historyItem);
+            });
+        }
+
+        function removeHistoryItem(index) {
+            let history = JSON.parse(localStorage.getItem('calculatorHistory')) || [];
+            history.splice(index, 1);
+            localStorage.setItem('calculatorHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        window.onload = displayHistory;
+    </script>
+</body>
+</html>
